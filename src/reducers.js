@@ -54,7 +54,7 @@ const chunks = (state = {}, action) => {
     return ChunksHandlers[action.type] ? ChunksHandlers[action.type](state, action.payload) : state;
 }
 
-const UserHandler = {)
+const UserHandler = {}
 
 const user = (state = 0, action) => {
     return UserHandler[action.type] ? UserHandler[action.type](state, action.payload) : state;
