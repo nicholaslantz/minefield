@@ -27,7 +27,7 @@ Chunk.propTypes = {
             isMine: PropTypes.bool.isRequired,
             owner: PropTypes.number.isRequired,
             revealed: PropTypes.bool.isRequired,
-            numNeighbors: PropTypes.bool.isRequired,
+            numNeighbors: PropTypes.number.isRequired,
         }).isRequired
     ).isRequired,
     sideLength: PropTypes.number.isRequired,

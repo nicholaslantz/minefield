@@ -9,12 +9,17 @@ function tileRepresentation({ isMine, owner, revealed, numNeighbors }) {
     return "tileRepresentation Error";
 }
 
-const Tile = ({ onClick, isMine, owner, revealed, numNeighbors }) => (
-    <td
-      onClick={onClick}
-    >
+const Tile = ({ isMine, owner, revealed, numNeighbors }) => (
+    <td>
       {tileRepresentation({ isMine, owner, revealed, numNeighbors })}
     </td>
 );
+
+Tile.propTypes = {
+    isMine: PropTypes.bool.isRequired,
+    owner: PropTypes.number.isRequired,
+    revealed: PropTypes.bool.isRequired,
+    numNeighbors: PropTypes.number.isRequired,
+};
 
 export default Tile;
