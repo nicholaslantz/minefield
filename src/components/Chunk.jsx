@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import Tile from 'Tile';
 
 const Chunk = ({ onClickTile, id, tiles, sideLength }) => (
     // Could be written better with partition function
@@ -10,7 +11,7 @@ const Chunk = ({ onClickTile, id, tiles, sideLength }) => (
               {
                   tiles.slice(i * sideLength, (i+1) * sideLength).map((t, j) => (
                       <Tile
-                        key={`{id}-{i*sideLength + j}`}
+                        key={`${id}-${i*sideLength + j}`}
                         {...t}
                         onClick={() => onClickTile(id, i * sideLength + j)}
                       />  
