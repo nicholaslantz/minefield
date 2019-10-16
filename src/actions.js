@@ -4,11 +4,11 @@ export const scrollWindow = (dx, dy, units = 'px') => ({
     type: 'SCROLL_WINDOW', payload: { dx, dy }
 })
 
-export const revealTile = (chunkId, tileId) => ({
+export const revealTile = (userId, chunkId, tileId) => ({
     type: 'REVEAL_TILE', payload: { chunkId, tileId }
 })
 
-export const decorateTile = (chunkId, tileId) => ({
+export const decorateTile = (userId, chunkId, tileId) => ({
     type: 'DECORATE_TILE', payload: { chunkId, tileId }
 })
 

@@ -11,7 +11,7 @@ const Chunk = ({ onClickTile, id, tiles, sideLength }) => (
                 <Tile
                   key={`${id}-${i*sideLength + j}`}
                   {...t}
-                  onClick={() => onClickTile(id, i * sideLength + j)}
+                  onClick={(e) => onClickTile(e, id, i * sideLength + j)}
                 />  
             ))}
           </tr>
