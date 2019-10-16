@@ -2,20 +2,23 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 function tileRepresentation({ isMine, owner, revealed, numNeighbors }) {
-    if ((! revealed) && (owner !== null)) return "F";
-    if ((! revealed) && (owner === null)) return " ";
-    if (revealed && isMine) return ".";
-    if (revealed && (! isMine)) return numNeighbors === 0 ? " " : numNeighbors;
+    if ((! revealed) && (owner !== -1)) return "F";
+    if ((! revealed) && (owner === -1)) return ".";
+    if (revealed && isMine) return "X";
+    if (revealed && (! isMine)) return numNeighbors === 0 ? "Y" : numNeighbors;
     return "tileRepresentation Error";
 }
 
-const Tile = ({ isMine, owner, revealed, numNeighbors }) => (
+const Tile = ({ onClick, isMine, owner, revealed, numNeighbors }) => (
     <td>
-      {tileRepresentation({ isMine, owner, revealed, numNeighbors })}
+      <button onClick={onClick}>
+        {tileRepresentation({ isMine, owner, revealed, numNeighbors })}
+      </button>
     </td>
 );
 
 Tile.propTypes = {
+    onClick: PropTypes.func.isRequired,
     isMine: PropTypes.bool.isRequired,
     owner: PropTypes.number.isRequired,
     revealed: PropTypes.bool.isRequired,

@@ -5,7 +5,7 @@ export const scrollWindow = (dx, dy, units = 'px') => ({
 })
 
 export const revealTile = (userId, chunkId, tileId) => ({
-    type: 'REVEAL_TILE', payload: { chunkId, tileId }
+    type: 'REVEAL_TILE', payload: { userId, chunkId, tileId }
 })
 
 export const decorateTile = (userId, chunkId, tileId) => ({

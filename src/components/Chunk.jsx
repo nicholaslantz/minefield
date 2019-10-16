@@ -1,21 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Tile from 'Tile';
+import Tile from './Tile';
 
 const Chunk = ({ onClickTile, id, tiles, sideLength }) => (
     // Could be written better with partition function
     <table>
-      {[...Array(sideLength).keys()].map(i => (
-          <tr>
-            {tiles.slice(i * sideLength, (i+1) * sideLength).map((t, j) => (
-                <Tile
-                  key={`${id}-${i*sideLength + j}`}
-                  {...t}
-                  onClick={(e) => onClickTile(e, id, i * sideLength + j)}
-                />  
-            ))}
-          </tr>
-      ))}
+      <tbody>
+        {[...Array(sideLength).keys()].map(i => (
+            <tr key={`${id}-${i}`}>
+              {tiles.slice(i * sideLength, (i+1) * sideLength).map((t, j) => (
+                  <Tile
+                    key={`${id}-${i*sideLength + j}`}
+                    {...t}
+                    onClick={(e) => onClickTile(e, id, i * sideLength + j)}
+                  />  
+              ))}
+            </tr>
+        ))}
+      </tbody>
     </table>
 );
 
