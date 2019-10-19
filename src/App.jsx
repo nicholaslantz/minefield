@@ -3,7 +3,7 @@ import VisualChunk from './containers/VisualChunk';
 
 const App = () => (
     <div>
-      <VisualChunk id={0}/>
+      <VisualChunk/>
     </div>
 );
 

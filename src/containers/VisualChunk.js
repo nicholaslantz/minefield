@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import { revealTile, decorateTile } from '../actions';
-import Chunk from '../components/Chunk.jsx';
+import ChunkField from '../components/ChunkField';
 
 const calcSideLength = (tiles) => Math.sqrt(tiles.length);
 
@@ -59,15 +59,23 @@ const processTiles = (tiles) => tiles.map((t, i) => {
 
 // TODO: Adapt for multiple chunks + check for chunks that don't
 // have neighbors.
+// const mapStateToProps = state => ({
+//     tiles: processTiles(state.chunks[0].tiles),
+//     sideLength: calcSideLength(state.chunks[0].tiles)
+// });
+
 const mapStateToProps = state => ({
-    tiles: processTiles(state.chunks[0].tiles),
-    sideLength: calcSideLength(state.chunks[0].tiles)
-});
+    chunks: Object.keys(state.chunks).map(i => ({
+	id: i,
+	tiles: processTiles(state.chunks[i].tiles),
+	sideLength: calcSideLength(state.chunks[i].tiles),
+    }))
+})					     
 
 const mapDispatchToProps = dispatch => ({
     onClickTile: (e, chunkId, tileId) => {
         e.preventDefault();
-        const user = 0;// store.getState().user;
+        const user = 0; // TODO: store.getState().user;
 
         console.log(e.nativeEvent);
         switch (e.nativeEvent.button) {
@@ -86,4 +94,4 @@ const mapDispatchToProps = dispatch => ({
 export default connect(
     mapStateToProps,
     mapDispatchToProps
-)(Chunk);
+)(ChunkField);

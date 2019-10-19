@@ -23,7 +23,7 @@ const Chunk = ({ onClickTile, id, tiles, sideLength }) => (
 
 Chunk.propTypes = {
     onClickTile: PropTypes.func.isRequired,
-    id: PropTypes.number.isRequired,
+    id: PropTypes.string.isRequired,
     tiles: PropTypes.arrayOf(
         PropTypes.shape({
             isMine: PropTypes.bool.isRequired,
