@@ -9,18 +9,12 @@ import { addChunk } from './actions';
 
 const store = createStore(rootReducer);
 
-store.dispatch(addChunk(0, [{ isMine: true, owner: -1, revealed: false },
-                            { isMine: false, owner: -1, revealed: false },
-                            { isMine: false, owner: -1, revealed: false },
-                            { isMine: false, owner: -1, revealed: false },
-                            { isMine: true, owner: -1, revealed: false },
-                            { isMine: false, owner: -1, revealed: false },
-                            { isMine: false, owner: -1, revealed: false },
-                            { isMine: false, owner: -1, revealed: false },
-                            { isMine: true, owner: -1, revealed: false },
-                           ],
-                        0, 0));
-console.log(store.getState());
+const genChunk = (genTile, n) => [...Array(n).keys()].map(genTile);
+store.dispatch(addChunk(0, genChunk(() => ({
+    isMine: Math.random() < 0.5,
+    owner: -1,
+    revealed: false
+}), 64)));
 
 render(
     <Provider store={store}>
