@@ -49,7 +49,7 @@ const processTiles = (tiles) => tiles.map((t, i) => {
 
     const numNeighbors = indices.filter(i => {
         return -1 < i && i < tiles.length;
-    }).filter(i => tiles[i].isMine).length;
+    }).reduce((acc, i) => acc + (tiles[i].isMine ? 1 : 0), 0);
     
     return {
         ...t,
