@@ -1,16 +1,11 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import VisualChunk from './containers/VisualChunk';
 
-import './components/Chunk.jsx';
+const App = () => (
+    <div>
+      <VisualChunk id={0}/>
+    </div>
+);
 
-function App() {
-    // TODO: Render all chunks in store
-    return (
-        <div className="App">
-          
-        </div>
-    );
-}
 
 export default App;
