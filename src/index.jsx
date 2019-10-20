@@ -13,7 +13,7 @@ const genChunk = (genTile, n) => [...Array(n).keys()].map(genTile);
 store.dispatch(addChunk(0, genChunk(() => ({
     isMine: Math.random() < 0.5,
     owner: -1,
-    revealed: true,
+    revealed: false,
 }), 64), 0, 0));
 store.dispatch(addChunk(1, genChunk(() => ({
     isMine: Math.random() < 0.5,

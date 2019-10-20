@@ -1,11 +1,71 @@
+body {
+    background: darkgray;
+}
+
 .tile {
     background-color: lightgray;
     border: outset;
-    width: 1.5em;
-    height: 1.5em;
+    width: 2rem;
+    height: 2rem;
     text-align: center;
     padding: 0px;
     margin: 0px;
     font-family: sans-serif;
-    font-size: 1.5em;
+    font-weight: 600;
+}
+
+.tile:focus {
+    outline: none;
+}
+
+.tile-revealed {
+    border: none;
+}
+
+.tile-hidden {
+    border: outset;
+}
+
+.tile-mine {
+    font-size: 1rem;
+}
+
+.tile-1 {
+    font-size: 1.5rem;
+    color: blue;
+}
+
+.tile-2 {
+    font-size: 1.5rem;
+    color: green;
+}
+
+.tile-3 {
+    font-size: 1.5rem;
+    color: red;
+}
+
+.tile-4 {
+    font-size: 1.5rem;
+    color: darkblue;
+}
+
+.tile-5 {
+    font-size: 1.5rem;
+    color: maroon;
+}
+
+.tile-6 {
+    font-size: 1.5rem;
+    color: teal;
+}
+
+.tile-7 {
+    font-size: 1.5rem;
+    color: black;
+}
+
+.tile-8 {
+    font-size: 1.5rem;
+    color: darkgreen;
 }
