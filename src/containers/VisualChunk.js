@@ -12,7 +12,7 @@ const processTiles = (tiles) => tiles.map((t, i) => {
         const m = {
             0: [1, s, s + 1],
             [s - 1]: [s - 2, 2*s - 2, 2*s - 1],
-            [s * s - s]: [s*s - 2*s, s*s - 2*s + 1],
+            [s * s - s]: [s*s - 2*s, s*s - 2*s + 1, s*s - s + 1],
             [s * s - 1]: [s*s - s - 2, s*s - s - 1, s*s - 1],
         };
         return m[i] ? m[i] : null;
@@ -47,9 +47,8 @@ const processTiles = (tiles) => tiles.map((t, i) => {
           sidesHandler(i) ? sidesHandler(i) :
           middleHandler(i);
 
-    const numNeighbors = indices.filter(i => {
-        return -1 < i && i < tiles.length;
-    }).reduce((acc, i) => acc + (tiles[i].isMine ? 1 : 0), 0);
+    const numNeighbors = indices.reduce(
+	(acc, i) => acc + (tiles[i].isMine ? 1 : 0), 0);
     
     return {
         ...t,
