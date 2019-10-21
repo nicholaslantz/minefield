@@ -11,9 +11,9 @@ const processTiles = (tiles) => tiles.map((t, i) => {
     const cornersHandler = (i) => {
         const m = {
             0: [1, s, s + 1],
-            [s - 1]: [s - 2, 2*s - 2, 2*s - 1],
-            [s * s - s]: [s*s - 2*s, s*s - 2*s + 1, s*s - s + 1],
-            [s * s - 1]: [s*s - s - 2, s*s - s - 1, s*s - 1],
+            [s - 1]: [i - 1, i + s - 1, i + s],
+            [s * s - s]: [i - s, i - s + 1, i + 1],
+            [s * s - 1]: [i - s - 1, i - s, i - 1],
         };
         return m[i] ? m[i] : null;
     };
