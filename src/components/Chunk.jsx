@@ -2,9 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Tile from './Tile';
 
-const Chunk = ({ onClickTile, id, tiles, sideLength }) => (
+const Chunk = ({ onClickTile, id, tiles, sideLength, x, y }) => (
     // Could be written better with partition function
-    <table>
+    <table
+      className="chunk"
+      style={{
+          top: y,
+          left: x
+      }}
+    >
       <tbody>
         {[...Array(sideLength).keys()].map(i => (
             <tr key={`${id}-${i}`}>

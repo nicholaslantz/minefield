@@ -2,7 +2,7 @@ import React from 'react';
 import Chunk from './Chunk';
 
 const ChunkField = ({ onClickTile, chunks }) => (
-    <div>
+    <div className="chunk-field">
       {chunks.map((c) => (
           <Chunk
             key={`${c.id}`}

@@ -2,6 +2,15 @@ body {
     background: darkgray;
 }
 
+.chunk-field {}
+
+.chunk {
+    position: absolute;
+    border: none;
+    padding: 0px;
+    margin: 0px;
+}
+
 .tile {
     background-color: lightgray;
     border: outset;

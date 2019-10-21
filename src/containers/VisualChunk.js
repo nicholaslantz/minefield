@@ -56,14 +56,57 @@ const processTiles = (tiles) => tiles.map((t, i) => {
     };
 });
 
+const processChunks = chunks => {
+    // Compute pixel coordinates of each chunk.
+    const chunkSize = 150;
+    const offsets = {
+	northwest: { x: -chunkSize, y: -chunkSize },
+	north:     { x: 0, y: -chunkSize },
+	northeast: { x: chunkSize, y: -chunkSize },
+	east:      { x: -chunkSize, y: 0 },
+        west:      { x: chunkSize, y: 0 },
+	southwest: { x: -chunkSize, y: chunkSize },
+	south:     { x: 0, y: chunkSize },
+	soucheast: { x: chunkSize, y: chunkSize },
+    };
+    
+    const start = Object.keys(chunks)[0];
+    const positions = { [start]: { x: 0, y: 0} };
+    const stk = [start];
+    
+    while (stk.length > 0) {
+	const next = stk.pop();
+	
+	Object.entries(chunks[next].neighbors).forEach(n => {
+	    const [dir, id] = n;
+	    if (positions.hasOwnProperty(id)) return;
+
+	    console.log(dir, id);
+	    positions[id] = {
+		x: positions[next].x + offsets[dir].x,
+		y: positions[next].y + offsets[dir].y,
+	    }
+	    stk.push(id)
+	})
+    }
+
+    return Object.keys(chunks).map(id => ({
+	id,
+	tiles: processTiles(chunks[id].tiles),
+	sideLength: calcSideLength(chunks[id].tiles),
+	...positions[id]
+    }));
+};
+
+// In order to place chunks in a table structure I need to determine
+// the number of rows, columns, and the relative locations of each of
+// the chunks...  At the same time I can place them absolutely given
+// an anchor...
+
 // TODO: Take chunk boundaries into account for processTiles
 // calculation.
 const mapStateToProps = state => ({
-    chunks: Object.keys(state.chunks).map(i => ({
-	id: i,
-	tiles: processTiles(state.chunks[i].tiles),
-	sideLength: calcSideLength(state.chunks[i].tiles),
-    }))
+    chunks: processChunks(state.chunks)
 })					     
 
 const mapDispatchToProps = dispatch => ({

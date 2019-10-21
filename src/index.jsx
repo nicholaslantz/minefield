@@ -17,7 +17,7 @@ const genChunk = (genTile, n) => [...Array(n).keys()].map(genTile);
 
 world.forEach((r, rc) => r.forEach((cid, cc) => {
     let directions = ['northwest', 'north', 'northeast', 'east',
-                     'west', 'southwest', 'south', 'soucheast'];
+                      'west', 'southwest', 'south', 'soucheast'];
     let offsets = [[-1, -1], [-1,  0], [-1, 1], [0, -1],
                    [ 0,  1], [ 1, -1], [ 1, 0], [1,  1]];
 
@@ -35,7 +35,7 @@ world.forEach((r, rc) => r.forEach((cid, cc) => {
         isMine: Math.random() < 0.2,
         owner: -1,
         revealed: false,
-    }), 64)));
+    }), 16)));
 }));
 
 console.log(store.getState());
