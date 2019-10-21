@@ -41,8 +41,8 @@ const processTiles = (tiles) => tiles.map((t, i) => {
         [i - s - 1, i - s, i - s + 1,
          i - 1,            i + 1,
          i + s - 1, i + s, i + s + 1];
-    // FIXME: There's probably a cleaner way to do this
 
+    // FIXME: There's probably a cleaner way to do this
     const indices = cornersHandler(i) ? cornersHandler(i) :
           sidesHandler(i) ? sidesHandler(i) :
           middleHandler(i);
@@ -56,13 +56,8 @@ const processTiles = (tiles) => tiles.map((t, i) => {
     };
 });
 
-// TODO: Adapt for multiple chunks + check for chunks that don't
-// have neighbors.
-// const mapStateToProps = state => ({
-//     tiles: processTiles(state.chunks[0].tiles),
-//     sideLength: calcSideLength(state.chunks[0].tiles)
-// });
-
+// TODO: Take chunk boundaries into account for processTiles
+// calculation.
 const mapStateToProps = state => ({
     chunks: Object.keys(state.chunks).map(i => ({
 	id: i,
@@ -76,7 +71,6 @@ const mapDispatchToProps = dispatch => ({
         e.preventDefault();
         const user = 0; // TODO: store.getState().user;
 
-        console.log(e.nativeEvent);
         switch (e.nativeEvent.button) {
         case 0:
             dispatch(revealTile(user, chunkId, tileId));

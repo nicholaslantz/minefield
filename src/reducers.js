@@ -15,9 +15,9 @@ const coords = (state = { x: 0, y: 0 }, action) => {
 
 const ChunksHandlers = {
     // TODO: Merge changes iff user modified
-    ADD_CHUNK: (state, { id, x, y, tiles }) => ({
+    ADD_CHUNK: (state, { id, neighbors, tiles }) => ({
 	...state,
-	[id]: { x, y, tiles },
+	[id]: { neighbors, tiles },
     }),
     REVEAL_TILE: (state, { userId, chunkId, tileId }) => {
 	const chunk = state[chunkId];

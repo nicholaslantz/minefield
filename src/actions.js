@@ -12,6 +12,6 @@ export const decorateTile = (userId, chunkId, tileId) => ({
     type: 'DECORATE_TILE', payload: { chunkId, tileId }
 })
 
-export const addChunk = (id, tiles, x, y) => ({
-    type: 'ADD_CHUNK', payload: { id, tiles, x, y }
+export const addChunk = (id, neighbors, tiles) => ({
+    type: 'ADD_CHUNK', payload: { id, neighbors, tiles }
 })
