@@ -2,7 +2,9 @@ body {
     background: darkgray;
 }
 
-.chunk-field {}
+.chunk-field {
+    position: absolute;
+}
 
 .chunk {
     table-layout: fixed;

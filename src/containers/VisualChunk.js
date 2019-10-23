@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import { revealTile, decorateTile } from '../actions';
+import { revealTile, decorateTile, scrollWindow } from '../actions';
 import ChunkField from '../components/ChunkField';
 
 const calcSideLength = (tiles) => Math.sqrt(tiles.length);
@@ -146,7 +146,9 @@ const processChunks = chunks => {
 };
 
 const mapStateToProps = state => ({
-    chunks: processChunks(state.chunks)
+    chunks: processChunks(state.chunks),
+    x: state.coords.x,
+    y: state.coords.y,
 })					     
 
 const mapDispatchToProps = dispatch => ({

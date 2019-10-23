@@ -5,7 +5,7 @@ import { createStore } from 'redux';
 import rootReducer from './reducers';
 import App from './App';
 
-import { addChunk } from './actions';
+import { addChunk, scrollWindow } from './actions';
 
 const store = createStore(rootReducer);
 
