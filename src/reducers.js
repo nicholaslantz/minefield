@@ -38,11 +38,11 @@ const ChunksHandlers = {
     },
     DECORATE_TILE: (state, { userId, chunkId, tileId }) => {
 	const chunk = state[chunkId];
-	const tile = chunk[tileId];
+	const tile = chunk.tiles[tileId];
 
 	if (tile.revealed) return state;
 	return {
-	    ...state, chunkId: {
+	    ...state, [chunkId]: {
 		...chunk, tiles: [
 		    ...chunk.tiles.slice(0, tileId),
 		    { ...tile, owner: tile.owner === -1 ? userId : -1 },

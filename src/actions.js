@@ -9,7 +9,7 @@ export const revealTile = (userId, chunkId, tileId) => ({
 })
 
 export const decorateTile = (userId, chunkId, tileId) => ({
-    type: 'DECORATE_TILE', payload: { chunkId, tileId }
+    type: 'DECORATE_TILE', payload: { userId, chunkId, tileId }
 })
 
 export const addChunk = (id, neighbors, tiles) => ({

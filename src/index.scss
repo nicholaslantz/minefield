@@ -35,7 +35,6 @@ body {
     width: 100%;
     height: 100%;
     background-color: lightgray;
-    border: outset;
     text-align: center;
     vertical-align: middle;
     padding: 0px;
@@ -48,17 +47,24 @@ body {
     outline: none;
 }
 
-.tile-revealed {
-    border: 1px solid darkgray;
+.tile-outset {
+    border: outset;
 }
 
-.tile-hidden {
-    border: outset;
+.tile-none {
+    border: 0.5px solid darkgray;
 }
 
 .tile-mine {
     font-size: 1rem;
 }
+
+.tile-decorated {
+    color: red;
+    font-size: 1.5rem;
+}
+
+.tile-empty {}
 
 .tile-1 {
     font-size: 1.5rem;

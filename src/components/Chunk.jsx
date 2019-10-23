@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Tile from './Tile';
 
-const Chunk = ({ onClickTile, id, tiles, sideLength, x, y }) => (
+const Chunk = ({ onClickTile, id, tiles, sideLength, x, y, isFunctional }) => (
     // Could be written better with partition function
     <table
       className="chunk"
@@ -18,7 +18,9 @@ const Chunk = ({ onClickTile, id, tiles, sideLength, x, y }) => (
                   <Tile
                     key={`${id}-${i*sideLength + j}`}
                     {...t}
-                    onClick={(e) => onClickTile(e, id, i * sideLength + j)}
+                    onClick={(e) => isFunctional ?
+                             onClickTile(e, id, i * sideLength + j) :
+                             e.preventDefault()}
                   />  
               ))}
             </tr>
@@ -39,6 +41,9 @@ Chunk.propTypes = {
         }).isRequired
     ).isRequired,
     sideLength: PropTypes.number.isRequired,
+    x: PropTypes.number.isRequired,
+    y: PropTypes.number.isRequired,
+    isFunctional: PropTypes.bool.isRequired
 };
 
 export default Chunk;

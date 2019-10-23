@@ -140,6 +140,7 @@ const processChunks = chunks => {
 	id,
 	tiles: processTiles(chunks[id].tiles, chunks[id].neighbors, chunks),
 	sideLength: calcSideLength(chunks[id].tiles),
+	isFunctional: Object.keys(chunks[id].neighbors).length === 8,
 	...positions[id]
     }));
 };
@@ -151,9 +152,11 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
     onClickTile: (e, chunkId, tileId) => {
         e.preventDefault();
+	e.stopPropagation();
         const user = 0; // TODO: store.getState().user;
 
-        switch (e.nativeEvent.button) {
+	console.log('test');
+        switch (e.button) {
         case 0:
             dispatch(revealTile(user, chunkId, tileId));
             break;
@@ -162,7 +165,7 @@ const mapDispatchToProps = dispatch => ({
             break;
         default:
             break;
-        }
+	}
     },
 });
 

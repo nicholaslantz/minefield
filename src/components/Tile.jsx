@@ -9,13 +9,21 @@ function tileRepresentation({ isMine, owner, revealed, numNeighbors }) {
     return "tileRepresentation Error";
 }
 
+function classes({ isMine, owner, revealed, numNeighbors }) {
+    if ((! revealed) && (owner !== -1)) return ['tile', 'tile-outset', 'tile-decorated'];
+    if ((! revealed) && (owner === -1)) return ['tile', 'tile-outset'];
+    if (revealed && isMine) return ['tile', 'tile-none', 'tile-mine'];
+    if (revealed && (! isMine)) return ['tile', 'tile-none', `tile-${numNeighbors}`];
+
+    return [];
+}
+
 const Tile = ({ onClick, isMine, owner, revealed, numNeighbors }) => (
     <td className="tile-container">
       <button
-        onClick={onClick}
-        className={['tile',
-                    revealed ? 'tile-revealed' : 'tile-hidden',
-                    isMine ? 'tile-mine' : `tile-${numNeighbors}`].join(' ')}
+        onContextMenu={(e) => e.preventDefault()}
+        onMouseUpCapture={onClick}
+        className={classes({ isMine, owner, revealed, numNeighbors }).join(' ')}
       >
         {tileRepresentation({ isMine, owner, revealed, numNeighbors })}
       </button>
