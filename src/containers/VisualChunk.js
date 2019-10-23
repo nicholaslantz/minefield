@@ -13,13 +13,46 @@ const processTiles = (tiles, neighbors, chunks) => tiles.map((t, ind) => {
     }, 0);
     
     const cornersHandler = i => {
+	const [nw, ne, sw, se] = [0, s - 1, s*s - s, s*s - 1];
         const m = {
-            0: [1, s, s + 1],
-            [s - 1]: [i - 1, i + s - 1, i + s],
-            [s * s - s]: [i - s, i - s + 1, i + 1],
-            [s * s - 1]: [i - s - 1, i - s, i - 1],
+            [nw]: () => {
+		if (['north', 'northwest', 'west'].some(dir => neighbors[dir] === undefined))
+		    return [];
+		const [north, northwest, west] = [chunks[neighbors.north].tiles,
+						  chunks[neighbors.northwest].tiles,
+						  chunks[neighbors.west].tiles];
+		return [tiles[1], tiles[s], tiles[s + 1], north[sw],
+			north[sw + 1], northwest[se], west[ne], west[ne + s]];
+	    },
+            [ne]: () => {
+		if (['north', 'northeast', 'east'].some(dir => neighbors[dir] === undefined))
+		    return [];
+		const [north, northeast, east] = [chunks[neighbors.north].tiles,
+						  chunks[neighbors.northeast].tiles,
+						  chunks[neighbors.east].tiles];
+		return [tiles[ne - 1], tiles[s + s - 1], tiles[ne + s], north[se],
+			north[se - 1], northeast[sw], east[nw], east[nw + s]];
+	    },
+            [sw]: () => {
+		if (['south', 'southwest', 'west'].some(dir => neighbors[dir] === undefined))
+		    return [];
+		const [south, southwest, west] = [chunks[neighbors.south].tiles,
+						  chunks[neighbors.southwest].tiles,
+						  chunks[neighbors.west].tiles];
+		return [tiles[sw - s], tiles[sw - s + 1], tiles[sw + 1], south[nw],
+			south[nw + 1], southwest[ne], west[se], west[se - s]];
+	    },
+            [se]: () => {
+		if (['south', 'southeast', 'east'].some(dir => neighbors[dir] === undefined))
+		    return [];
+		const [south, southeast, east] = [chunks[neighbors.south].tiles,
+						  chunks[neighbors.southeast].tiles,
+						  chunks[neighbors.east].tiles];
+		return [tiles[se - s - 1], tiles[se - s], tiles[se - 1], south[ne],
+			south[ne - 1], southeast[nw], east[sw], east[sw - s]];
+	    }
         };
-        return m[i] ? count(m[i], tiles) : null;
+        return m[i] ? m[i]().reduce((acc, tile) => acc + (tile.isMine ? 1 : 0), 0) : null;
     };
     const sidesHandler = i => {
         // North
@@ -51,12 +84,9 @@ const processTiles = (tiles, neighbors, chunks) => tiles.map((t, ind) => {
 	    const b = i % s;
 	    rest = [b - 1, b, b + 1];
         }
-	console.log('s', rest, neighbors[dir]);
-
 	if (inChunk === null) return null;
-	if (! neighbors.hasOwnProperty(dir)) return 9; // FIXME
+	if (! neighbors.hasOwnProperty(dir)) return 0; // FIXME
 
-	console.log(chunks)
 	return count(inChunk, tiles) + count(rest, chunks[neighbors[dir]].tiles);
     };
     const middleHandler = (i) => 
