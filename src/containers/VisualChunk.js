@@ -105,7 +105,6 @@ const processTiles = (tiles, neighbors, chunks) => tiles.map((t, ind) => {
 });
 
 const processChunks = chunks => {
-    // Compute pixel coordinates of each chunk.
     const chunkSize = 150;
     const offsets = {
 	northwest: { x: -chunkSize, y: -chunkSize },
@@ -115,7 +114,7 @@ const processChunks = chunks => {
         west:      { x: -chunkSize, y: 0 },
 	southwest: { x: -chunkSize, y: chunkSize },
 	south:     { x: 0, y: chunkSize },
-	soucheast: { x: chunkSize, y: chunkSize },
+	southeast: { x: chunkSize, y: chunkSize },
     };
     
     const start = Object.keys(chunks)[0];
@@ -145,13 +144,6 @@ const processChunks = chunks => {
     }));
 };
 
-// In order to place chunks in a table structure I need to determine
-// the number of rows, columns, and the relative locations of each of
-// the chunks...  At the same time I can place them absolutely given
-// an anchor...
-
-// TODO: Take chunk boundaries into account for processTiles
-// calculation.
 const mapStateToProps = state => ({
     chunks: processChunks(state.chunks)
 })					     
