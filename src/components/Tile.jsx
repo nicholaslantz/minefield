@@ -10,7 +10,7 @@ function tileRepresentation({ isMine, owner, revealed, numNeighbors }) {
 }
 
 const Tile = ({ onClick, isMine, owner, revealed, numNeighbors }) => (
-    <td>
+    <td className="tile-container">
       <button
         onClick={onClick}
         className={['tile',
