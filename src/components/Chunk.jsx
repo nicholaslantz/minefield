@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Tile from './Tile';
 
-const Chunk = ({ onClickTile, id, tiles, sideLength, x, y, isFunctional }) => (
+const Chunk = ({ onClickTile, onContextMenuTile, id, tiles, sideLength, x, y, isFunctional }) => (
     // Could be written better with partition function
     <table
       className="chunk"
@@ -21,6 +21,9 @@ const Chunk = ({ onClickTile, id, tiles, sideLength, x, y, isFunctional }) => (
                     onClick={(e) => isFunctional ?
                              onClickTile(e, id, i * sideLength + j) :
                              e.preventDefault()}
+                    onContextMenu={(e) => isFunctional ?
+                             onContextMenuTile(e, id, i * sideLength + j) :
+                             e.preventDefault()}
                   />  
               ))}
             </tr>
@@ -31,6 +34,7 @@ const Chunk = ({ onClickTile, id, tiles, sideLength, x, y, isFunctional }) => (
 
 Chunk.propTypes = {
     onClickTile: PropTypes.func.isRequired,
+    onContextMenuTile: PropTypes.func.isRequired,
     id: PropTypes.string.isRequired,
     tiles: PropTypes.arrayOf(
         PropTypes.shape({

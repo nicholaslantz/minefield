@@ -18,10 +18,10 @@ function classes({ isMine, owner, revealed, numNeighbors }) {
     return [];
 }
 
-const Tile = ({ onClick, isMine, owner, revealed, numNeighbors }) => (
+const Tile = ({ onClick, onContextMenu, isMine, owner, revealed, numNeighbors }) => (
     <td className="tile-container">
       <button
-        onContextMenu={(e) => e.preventDefault()}
+        onContextMenu={onContextMenu}
         onMouseUpCapture={onClick}
         className={classes({ isMine, owner, revealed, numNeighbors }).join(' ')}
       >
@@ -32,6 +32,7 @@ const Tile = ({ onClick, isMine, owner, revealed, numNeighbors }) => (
 
 Tile.propTypes = {
     onClick: PropTypes.func.isRequired,
+    onContextMenu: PropTypes.func.isRequired,
     isMine: PropTypes.bool.isRequired,
     owner: PropTypes.number.isRequired,
     revealed: PropTypes.bool.isRequired,

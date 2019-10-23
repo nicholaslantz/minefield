@@ -152,21 +152,18 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
     onClickTile: (e, chunkId, tileId) => {
         e.preventDefault();
-	e.stopPropagation();
-        const user = 0; // TODO: store.getState().user;
 
-	console.log('test');
-        switch (e.button) {
-        case 0:
+        const user = 0; // TODO: store.getState().user;
+	if (e.button === 0) {
             dispatch(revealTile(user, chunkId, tileId));
-            break;
-        case 2:
-            dispatch(decorateTile(user, chunkId, tileId));
-            break;
-        default:
-            break;
 	}
     },
+    onContextMenuTile: (e, chunkId, tileId) => {
+	e.preventDefault();
+
+	const user = 0; // FIXME
+	dispatch(decorateTile(user, chunkId, tileId));
+    }
 });
 
 export default connect(
