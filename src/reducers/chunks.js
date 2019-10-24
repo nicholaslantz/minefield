@@ -1,18 +1,3 @@
-import { combineReducers } from 'redux';
-
-const CoordsHandlers = {
-    SCROLL_WINDOW: (state, { dx, dy }) => {
-	return {
-	    x: state.x + dx,
-	    y: state.y + dy,
-	};
-    }
-};
-
-const coords = (state = { x: 0, y: 0 }, action) => {
-    return CoordsHandlers[action.type] ? CoordsHandlers[action.type](state, action.payload) : state;
-};
-
 const ChunksHandlers = {
     // TODO: Merge changes iff user modified
     ADD_CHUNK: (state, { id, neighbors, tiles }) => ({
@@ -55,16 +40,6 @@ const ChunksHandlers = {
 
 const chunks = (state = {}, action) => {
     return ChunksHandlers[action.type] ? ChunksHandlers[action.type](state, action.payload) : state;
-};
+}
 
-const UserHandler = {};
-
-const user = (state = 0, action) => {
-    return UserHandler[action.type] ? UserHandler[action.type](state, action.payload) : state;
-};
-
-export default combineReducers({
-    coords,
-    chunks,
-    user,
-});
+export default chunks;
