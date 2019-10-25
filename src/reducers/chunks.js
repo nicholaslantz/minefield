@@ -1,45 +1,35 @@
+import Tiles from './tiles';
+
 const ChunksHandlers = {
     // TODO: Merge changes iff user modified
-    ADD_CHUNK: (state, { id, neighbors, tiles }) => ({
+    ADD_CHUNK: (state, { type, payload }) => ({
 	...state,
-	[id]: { neighbors, tiles },
+	[payload.id]: { neighbors: payload.neighbors, tiles: payload.tiles },
     }),
-    REVEAL_TILE: (state, { userId, chunkId, tileId }) => {
-	const chunk = state[chunkId];
-	const tile = chunk.tiles[tileId];
-
-	// FIXME: I want a tiles handler.
-	if (tile.revealed || (tile.owner !== -1)) return state;
+    REVEAL_TILE: (state, action) => {
+	const chunk = state[action.payload.chunkId];
         
 	return {
-	    ...state, [chunkId]: {
-		...chunk, tiles: [
-		    ...chunk.tiles.slice(0, tileId),
-		    { ...tile, revealed: true, owner: userId },
-		    ...chunk.tiles.slice(tileId+1),
-		]
+	    ...state, [action.payload.chunkId]: {
+		...chunk,
+		tiles: Tiles(chunk.tiles, action)
 	    }
 	};
     },
-    DECORATE_TILE: (state, { userId, chunkId, tileId }) => {
-	const chunk = state[chunkId];
-	const tile = chunk.tiles[tileId];
-
-	if (tile.revealed) return state;
+    DECORATE_TILE: (state, action) => {
+	const chunk = state[action.payload.chunkId];
+	
 	return {
-	    ...state, [chunkId]: {
-		...chunk, tiles: [
-		    ...chunk.tiles.slice(0, tileId),
-		    { ...tile, owner: tile.owner === -1 ? userId : -1 },
-		    ...chunk.tiles.slice(tileId+1),
-		]
+	    ...state, [action.payload.chunkId]: {
+		...chunk,
+		tiles: Tiles(chunk.tiles, action),
 	    }
 	};
     },
 };
 
 const chunks = (state = {}, action) => {
-    return ChunksHandlers[action.type] ? ChunksHandlers[action.type](state, action.payload) : state;
+    return ChunksHandlers[action.type] ? ChunksHandlers[action.type](state, action) : state;
 }
 
 export default chunks;
