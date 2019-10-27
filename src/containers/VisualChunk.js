@@ -7,10 +7,10 @@ import { sideLength, tileNeighbors, onBoundary } from '../reducers/chunks';
 // FIXME: I'd prefer this not run every time a chunk is modified,
 // cache result somehow.
 const processTiles = (state, chunkId) => state[chunkId].tiles.map((t, i) => ({
-    ...t,
-    numNeighbors: tileNeighbors(state, chunkId, i).reduce((acc, tile) => {
-	return acc + (tile.isMine ? 1 : 0);
+    numNeighbors: Object.entries(tileNeighbors(state, chunkId, i)).reduce((acc, [cid, tids]) => {
+	return acc + tids.reduce((acc, tid) => acc + (state[cid].tiles[tid].isMine ? 1 : 0), 0);
     }, 0),
+    ...t,
 }));
 
 const processChunks = chunks => {
@@ -51,7 +51,7 @@ const processChunks = chunks => {
 	id,
 	tiles: processTiles(chunks, id),
 	sideLength: sideLength(chunks),
-	isFunctional: Object.keys(chunks[id].neighbors).length === 8,
+	isFunctional: ! onBoundary(chunks, id),
 	...positions[id]
     }));
 };

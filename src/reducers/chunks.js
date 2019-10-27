@@ -59,42 +59,58 @@ const tileNeighbors = (state, chunkId, tileId) => {
         const m = {
             [nw]: () => {
 		if (['north', 'northwest', 'west'].some(dir => state[neighbors[dir]] === undefined))
-		    return [];
-		const [north, northwest, west] = [state[neighbors.north].tiles,
-						  state[neighbors.northwest].tiles,
-						  state[neighbors.west].tiles];
-		return [tiles[1], tiles[s], tiles[s + 1], north[sw],
-			north[sw + 1], northwest[se], west[ne], west[ne + s]];
+		    return {};
+		const [north, northwest, west] = [neighbors.north,
+						  neighbors.northwest,
+						  neighbors.west];
+		return {
+		    [chunkId]: [1, s, s + 1],
+		    [north]: [sw, sw + 1],
+		    [northwest]: [se],
+		    [west]: [ne + s],
+		};
 	    },
             [ne]: () => {
 		if (['north', 'northeast', 'east'].some(dir => state[neighbors[dir]] === undefined))
-		    return [];
-		const [north, northeast, east] = [state[neighbors.north].tiles,
-						  state[neighbors.northeast].tiles,
-						  state[neighbors.east].tiles];
-		return [tiles[ne - 1], tiles[ne + s - 1], tiles[ne + s], north[se],
-			north[se - 1], northeast[sw], east[nw], east[nw + s]];
+		    return {};
+		const [north, northeast, east] = [neighbors.north,
+						  neighbors.northeast,
+						  neighbors.east];
+		return {
+		    [chunkId]: [ne - 1, ne + s - 1, ne + s],
+		    [north]: [se, se - 1],
+		    [northeast]: [sw],
+		    [east]: [nw, nw + s],
+		};
 	    },
             [sw]: () => {
 		if (['south', 'southwest', 'west'].some(dir => state[neighbors[dir]] === undefined))
-		    return [];
-		const [south, southwest, west] = [state[neighbors.south].tiles,
-						  state[neighbors.southwest].tiles,
-						  state[neighbors.west].tiles];
-		return [tiles[sw - s], tiles[sw - s + 1], tiles[sw + 1], south[nw],
-			south[nw + 1], southwest[ne], west[se], west[se - s]];
+		    return {};
+		const [south, southwest, west] = [neighbors.south,
+						  neighbors.southwest,
+						  neighbors.west];
+		return {
+		    [chunkId]: [sw - s, sw - s + 1, sw + 1],
+		    [south]: [nw, nw + 1],
+		    [southwest]: [ne],
+		    [west]: [se, se - s],
+		};
 	    },
             [se]: () => {
 		if (['south', 'southeast', 'east'].some(dir => state[neighbors[dir]] === undefined))
-		    return [];
-		const [south, southeast, east] = [state[neighbors.south].tiles,
-						  state[neighbors.southeast].tiles,
-						  state[neighbors.east].tiles];
-		return [tiles[se - s - 1], tiles[se - s], tiles[se - 1], south[ne],
-			south[ne - 1], southeast[nw], east[sw], east[sw - s]];
+		    return {};
+		const [south, southeast, east] = [neighbors.south,
+						  neighbors.southeast,
+						  neighbors.east];
+		return {
+		    [chunkId]: [se - s - 1, se - s, se - 1],
+		    [south]: [ne, ne - 1],
+		    [southeast]: [nw],
+		    [east]: [sw, sw - s],
+		};
 	    }
         };
-        return m[i] ? m[i]() : null
+        return m[i] ? m[i]() : null;
     };
     
     const sidesHandler = ({ neighbors, tiles }, i) => {
@@ -131,17 +147,19 @@ const tileNeighbors = (state, chunkId, tileId) => {
 	    return null;
 	}
 
-	if (state[neighbors[dir]] === undefined) return [];
-	
-	const chunkTiles = inChunk.map(ind => tiles[ind]);
-	const restTiles = rest.map(ind => state[neighbors[dir]].tiles[ind]);
-	return chunkTiles.concat(restTiles)
+	if (state[neighbors[dir]] === undefined) return {};
+
+	return {
+	    [chunkId]: inChunk,
+	    [neighbors[dir]]: rest,
+	};
     };
     
-    const middleHandler = ({ neighbors, tiles }, i) => 
-          [i - s - 1, i - s, i - s + 1,
-	   i - 1,            i + 1,
-	   i + s - 1, i + s, i + s + 1].map(ind => tiles[ind]);
+    const middleHandler = ({ neighbors, tiles }, i) => ({
+	[chunkId]: [i - s - 1, i - s, i - s + 1,
+		    i - 1,            i + 1,
+		    i + s - 1, i + s, i + s + 1]
+    });
     
     return cornersHandler(chunk, tileId) ||
 	sidesHandler(chunk, tileId) || middleHandler(chunk, tileId);
