@@ -24,9 +24,16 @@ world.forEach((r, rc) => r.forEach((cid, cc) => {
     let neighbors = {};
     for (let i = 0; i < directions.length; i++) {
         const row = world[rc + offsets[i][0]];
-        if (row === undefined) continue;
+        if (row === undefined) {
+            neighbors[directions[i]] = -1;
+            continue;
+        }
+        
         const col = row[cc + offsets[i][1]];
-        if (col === undefined) continue;
+        if (col === undefined) {
+            neighbors[directions[i]] = -1;
+            continue;
+        }
 
         neighbors[directions[i]] = col;
     }

@@ -2,7 +2,7 @@ import { connect } from 'react-redux';
 import { revealTile, decorateTile, scrollWindow } from '../actions';
 import ChunkField from '../components/ChunkField';
 
-import { sideLength, tileNeighbors } from '../reducers/chunks';
+import { sideLength, tileNeighbors, onBoundary } from '../reducers/chunks';
 
 // FIXME: I'd prefer this not run every time a chunk is modified,
 // cache result somehow.
@@ -35,13 +35,15 @@ const processChunks = chunks => {
 	
 	Object.entries(chunks[next].neighbors).forEach(n => {
 	    const [dir, id] = n;
-	    if (positions.hasOwnProperty(id)) return;
+	    if (positions[id] !== undefined) return;
+	    if (chunks[id] === undefined) return;
 
 	    positions[id] = {
 		x: positions[next].x + offsets[dir].x,
 		y: positions[next].y + offsets[dir].y,
 	    }
-	    stk.push(id)
+
+	    if (! onBoundary(chunks, id)) stk.push(id)
 	})
     }
 

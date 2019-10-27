@@ -58,7 +58,7 @@ const tileNeighbors = (state, chunkId, tileId) => {
 	const [nw, ne, sw, se] = [0, s - 1, s*s - s, s*s - 1];
         const m = {
             [nw]: () => {
-		if (['north', 'northwest', 'west'].some(dir => neighbors[dir] === undefined))
+		if (['north', 'northwest', 'west'].some(dir => state[neighbors[dir]] === undefined))
 		    return [];
 		const [north, northwest, west] = [state[neighbors.north].tiles,
 						  state[neighbors.northwest].tiles,
@@ -67,7 +67,7 @@ const tileNeighbors = (state, chunkId, tileId) => {
 			north[sw + 1], northwest[se], west[ne], west[ne + s]];
 	    },
             [ne]: () => {
-		if (['north', 'northeast', 'east'].some(dir => neighbors[dir] === undefined))
+		if (['north', 'northeast', 'east'].some(dir => state[neighbors[dir]] === undefined))
 		    return [];
 		const [north, northeast, east] = [state[neighbors.north].tiles,
 						  state[neighbors.northeast].tiles,
@@ -76,7 +76,7 @@ const tileNeighbors = (state, chunkId, tileId) => {
 			north[se - 1], northeast[sw], east[nw], east[nw + s]];
 	    },
             [sw]: () => {
-		if (['south', 'southwest', 'west'].some(dir => neighbors[dir] === undefined))
+		if (['south', 'southwest', 'west'].some(dir => state[neighbors[dir]] === undefined))
 		    return [];
 		const [south, southwest, west] = [state[neighbors.south].tiles,
 						  state[neighbors.southwest].tiles,
@@ -85,7 +85,7 @@ const tileNeighbors = (state, chunkId, tileId) => {
 			south[nw + 1], southwest[ne], west[se], west[se - s]];
 	    },
             [se]: () => {
-		if (['south', 'southeast', 'east'].some(dir => neighbors[dir] === undefined))
+		if (['south', 'southeast', 'east'].some(dir => state[neighbors[dir]] === undefined))
 		    return [];
 		const [south, southeast, east] = [state[neighbors.south].tiles,
 						  state[neighbors.southeast].tiles,
@@ -131,7 +131,7 @@ const tileNeighbors = (state, chunkId, tileId) => {
 	    return null;
 	}
 
-	if (neighbors[dir] === undefined) return [];
+	if (state[neighbors[dir]] === undefined) return [];
 	
 	const chunkTiles = inChunk.map(ind => tiles[ind]);
 	const restTiles = rest.map(ind => state[neighbors[dir]].tiles[ind]);
@@ -148,5 +148,14 @@ const tileNeighbors = (state, chunkId, tileId) => {
 }
 
 export { tileNeighbors };
+
+const onBoundary = (state, chunkId) => {
+    if (state[chunkId] === undefined) return true;
+
+    const neighbors = state[chunkId].neighbors;
+    return Object.keys(neighbors).some(dir => state[neighbors[dir]] === undefined);
+}
+
+export { onBoundary };
 
 export default chunks;
