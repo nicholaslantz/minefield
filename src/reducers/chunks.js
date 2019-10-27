@@ -11,13 +11,28 @@ const ChunksHandlers = {
     }),
     REVEAL_TILE: (state, { userId, chunkId, tileId }, action) => {
 	const chunk = state[chunkId];
-        
-	return {
-	    ...state, [chunkId]: {
-		...chunk,
-		tiles: Tiles(chunk.tiles, action)
-	    }
-	};
+
+	if (chunk.tiles[tileId].revealed) return state;
+	if (chunk.tiles[tileId].owner !== -1) return state;
+
+	// FIXME: Clicking on mine reveals neighbors, that shouldn't happen.
+	const toReveal = findNonMineNeighbors(state, chunkId, tileId);
+
+	let newState = { ...state };
+        Object.entries(toReveal).forEach(([cid, tids]) => {
+	    let newTiles = [...state[cid].tiles];
+	    tids.filter(id => ((newTiles[id].owner === -1)
+			       && (! newTiles[id].revealed))).forEach(id => {
+				   newTiles[id] = {
+				       ...newTiles[id],
+				       revealed: true,
+				       owner: userId,
+				   };
+			       });
+	    newState[cid].tiles = newTiles;
+	});
+	
+	return newState;
     },
     DECORATE_TILE: (state, { userId, chunkId, tileId }, action) => {
 	const chunk = state[chunkId];
@@ -172,6 +187,41 @@ const onBoundary = (state, chunkId) => {
 
     const neighbors = state[chunkId].neighbors;
     return Object.keys(neighbors).some(dir => state[neighbors[dir]] === undefined);
+}
+
+const hasMineNeighbors = (state, chunkId, tileId) => {
+    return Object.entries(tileNeighbors(state, chunkId, tileId)).some(([cid, tids]) => {
+	return tids.some(tid => state[cid].tiles[tid].isMine);
+    });
+}
+
+
+const findNonMineNeighbors = (state, chunkId, tileId) => {
+    const stk = { [chunkId]: [tileId] };
+    const results = {};
+
+    while (Object.keys(stk).length !== 0) {
+	const nextCid = Object.keys(stk)[0]
+	const nextTid = stk[nextCid].pop();
+
+	if (stk[nextCid].length === 0) delete stk[nextCid];
+	if (results[nextCid] !== undefined && results[nextCid].indexOf(nextTid) !== -1) {
+	    continue;
+	}
+
+	if (results[nextCid] !== undefined) results[nextCid].push(nextTid);
+	else results[nextCid] = [nextTid];
+
+	if (! hasMineNeighbors(state, nextCid, nextTid)) {
+	    const adjacents = tileNeighbors(state, nextCid, nextTid);
+	    Object.entries(adjacents).forEach(([cid, tids]) => {
+		if (stk[cid] === undefined) stk[cid] = tids;
+		else stk[cid] = stk[cid].concat(tids);
+	    })
+	}
+    }
+
+    return results;
 }
 
 export { onBoundary };

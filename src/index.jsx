@@ -39,7 +39,7 @@ world.forEach((r, rc) => r.forEach((cid, cc) => {
     }
     
     store.dispatch(addChunk(cid, neighbors, genChunk(() => ({
-        isMine: Math.random() < 0.2,
+        isMine: Math.random() < 0.05,
         owner: -1,
         revealed: false,
     }), 16)));
