@@ -1,5 +1,3 @@
-import Tiles from './tiles';
-
 const Directions = ['north', 'northwest', 'west', 'southwest',
 		    'south', 'southeast', 'east', 'northeast'];
 
@@ -9,7 +7,7 @@ const ChunksHandlers = {
 	...state,
 	[id]: { neighbors, tiles },
     }),
-    REVEAL_TILE: (state, { userId, chunkId, tileId }, action) => {
+    REVEAL_TILE: (state, { userId, chunkId, tileId }) => {
 	const chunk = state[chunkId];
 
 	if (chunk.tiles[tileId].revealed) return state;
@@ -36,20 +34,23 @@ const ChunksHandlers = {
 	
 	return newState;
     },
-    DECORATE_TILE: (state, { userId, chunkId, tileId }, action) => {
+    DECORATE_TILE: (state, { userId, chunkId, tileId }) => {
 	const chunk = state[chunkId];
+	const tile = chunk.tiles[tileId];
 	
 	return {
-	    ...state, [action.payload.chunkId]: {
+	    ...state, [chunkId]: {
 		...chunk,
-		tiles: Tiles(chunk.tiles, action),
+		tiles: [...chunk.tiles.slice(0, tileId),
+		        {...tile, owner: tile.owner === -1 ? userId : -1},
+		        ...chunk.tiles.slice(tileId + 1)]
 	    }
 	};
     },
 };
 
 const chunks = (state = {}, action) => {
-    return ChunksHandlers[action.type] ? ChunksHandlers[action.type](state, action.payload, action) : state;
+    return ChunksHandlers[action.type] ? ChunksHandlers[action.type](state, action.payload) : state;
 }
 
 // TODO:  Do utility functions belong here, or somewhere else?
