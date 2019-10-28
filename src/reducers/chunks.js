@@ -85,7 +85,7 @@ const tileNeighbors = (state, chunkId, tileId) => {
 		    [chunkId]: [1, s, s + 1],
 		    [north]: [sw, sw + 1],
 		    [northwest]: [se],
-		    [west]: [ne + s],
+		    [west]: [ne, ne + s],
 		};
 	    },
             [ne]: () => {
