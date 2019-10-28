@@ -9,12 +9,49 @@ const ChunksHandlers = {
     }),
     REVEAL_TILE: (state, { userId, chunkId, tileId }) => {
 	const chunk = state[chunkId];
+	const tile = chunk.tiles[tileId];
 
-	if (chunk.tiles[tileId].revealed) return state;
-	if (chunk.tiles[tileId].owner !== -1) return state;
+	if (tile.owner !== -1 && !tile.revealed) return state;
 
+	let tilesToReveal;
+	if (tile.revealed) {
+	    // Check for chord
+	    const adjacents = tileNeighbors(state, chunkId, tileId);
+	    const numKnown = Object.entries(adjacents)
+		  .reduce((acc, [cid, tids]) => {
+		      return acc + tids
+			  .map(tid => state[cid].tiles[tid])
+			  .reduce((acc, t) => {
+			      if (t.owner !== -1 && !t.revealed) return acc + 1;
+			      if (t.isMine && t.revealed) return acc + 1;
+			      return acc;
+			  }, 0)
+		  }, 0);
+	    const numMines = Object.entries(adjacents)
+		  .reduce((acc, [cid, tids]) => {
+		      return acc + tids
+			  .map(tid => state[cid].tiles[tid])
+			  .reduce((acc, t) => acc + (t.isMine ? 1 : 0), 0)
+		  }, 0);
+
+	    if (numKnown === numMines) {
+		// Successful chord
+		tilesToReveal = Object.entries(adjacents)
+		    .reduce((acc, [cid, tids]) => {
+			const hidden = tids.filter(tid => state[cid].tiles[tid].owner === -1);
+			if (hidden.length > 0) acc[cid] = hidden;
+			return acc;
+		    }, {});
+	    } else {
+		tilesToReveal = {};
+	    }
+	} else {
+	    tilesToReveal = { [chunkId]: [tileId] };
+	}
+
+	//
 	// FIXME: Clicking on mine reveals neighbors, that shouldn't happen.
-	const toReveal = findNonMineNeighbors(state, chunkId, tileId);
+	const toReveal = findNonMineNeighbors(state, tilesToReveal);
 
 	let newState = { ...state };
         Object.entries(toReveal)
@@ -199,8 +236,8 @@ const hasMineNeighbors = (state, chunkId, tileId) => {
 }
 
 
-const findNonMineNeighbors = (state, chunkId, tileId) => {
-    const stk = { [chunkId]: [tileId] };
+const findNonMineNeighbors = (state, start) => {
+    const stk = start;
     const results = {};
 
     while (Object.keys(stk).length !== 0) {
