@@ -19,18 +19,20 @@ const ChunksHandlers = {
 	const toReveal = findNonMineNeighbors(state, chunkId, tileId);
 
 	let newState = { ...state };
-        Object.entries(toReveal).forEach(([cid, tids]) => {
-	    let newTiles = [...state[cid].tiles];
-	    tids.filter(id => ((newTiles[id].owner === -1)
-			       && (! newTiles[id].revealed))).forEach(id => {
-				   newTiles[id] = {
-				       ...newTiles[id],
-				       revealed: true,
-				       owner: userId,
-				   };
-			       });
-	    newState[cid].tiles = newTiles;
-	});
+        Object.entries(toReveal)
+	    .filter(([cid, tids]) => ! onBoundary(state, cid))
+	    .forEach(([cid, tids]) => {
+		let newTiles = [...state[cid].tiles];
+		tids.filter(id => ((newTiles[id].owner === -1)
+				   && (! newTiles[id].revealed))).forEach(id => {
+				       newTiles[id] = {
+					   ...newTiles[id],
+					   revealed: true,
+					   owner: userId,
+				       };
+				   });
+		newState[cid].tiles = newTiles;
+	    });
 	
 	return newState;
     },
