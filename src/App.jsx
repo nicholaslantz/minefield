@@ -1,9 +1,9 @@
 import React from 'react';
-import VisualChunk from './containers/VisualChunk';
+import VisualChunkField from './containers/VisualChunkField';
 
 const App = () => (
     <div>
-      <VisualChunk/>
+      <VisualChunkField />
     </div>
 );
 
