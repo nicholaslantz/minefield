@@ -13,60 +13,45 @@ const ChunksHandlers = {
 
 	if (tile.owner !== -1 && !tile.revealed) return state;
 
-	let tilesToReveal;
-	if (tile.revealed) {
+	let toReveal;
+	if (! tile.revealed) {
+	    toReveal = { [chunkId]: [tileId] };
+	} else {
 	    // Check for chord
 	    const adjacents = tileNeighbors(state, chunkId, tileId);
-	    const numKnown = Object.entries(adjacents)
-		  .reduce((acc, [cid, tids]) => {
-		      return acc + tids
-			  .map(tid => state[cid].tiles[tid])
-			  .reduce((acc, t) => {
-			      if (t.owner !== -1 && !t.revealed) return acc + 1;
-			      if (t.isMine && t.revealed) return acc + 1;
-			      return acc;
-			  }, 0)
+	    const numKnown = dereferencePaths(state, adjacents)
+		  .reduce((acc, t) => {
+		      if (!t.revealed && t.owner !== -1) return acc + 1;
+		      if ( t.revealed && t.isMine)       return acc + 1;
+		      return acc;
 		  }, 0);
-	    const numMines = Object.entries(adjacents)
-		  .reduce((acc, [cid, tids]) => {
-		      return acc + tids
-			  .map(tid => state[cid].tiles[tid])
-			  .reduce((acc, t) => acc + (t.isMine ? 1 : 0), 0)
-		  }, 0);
+	    const numMines = dereferencePaths(state, adjacents)
+		  .reduce((acc, t) => acc + (t.isMine ? 1 : 0), 0);
 
-	    if (numKnown === numMines) {
-		// Successful chord
-		tilesToReveal = Object.entries(adjacents)
-		    .reduce((acc, [cid, tids]) => {
-			const hidden = tids.filter(tid => state[cid].tiles[tid].owner === -1);
-			if (hidden.length > 0) acc[cid] = hidden;
-			return acc;
-		    }, {});
-	    } else {
-		tilesToReveal = {};
-	    }
-	} else {
-	    tilesToReveal = { [chunkId]: [tileId] };
-	}
+	    if (numKnown !== numMines) return state;
+	    
+	    // Successful chord
+	    toReveal = Object.entries(adjacents)
+		.reduce((acc, [cid, tids]) => {
+		    const hidden = tids.filter(tid => state[cid].tiles[tid].owner === -1);
+		    if (hidden.length > 0) acc[cid] = hidden;
+		    return acc;
+		}, {});
+	} 	    
 
-	//
-	// FIXME: Clicking on mine reveals neighbors, that shouldn't happen.
-	const toReveal = findNonMineNeighbors(state, tilesToReveal);
+	// Expands tiles to reveal to include empty space next to revealed tile.
+	const expanded = tile.isMine ? toReveal : expandArea(state, toReveal);
 
 	let newState = { ...state };
-        Object.entries(toReveal)
+        Object.entries(expanded)
 	    .filter(([cid, tids]) => ! onBoundary(state, cid))
 	    .forEach(([cid, tids]) => {
-		let newTiles = [...state[cid].tiles];
-		tids.filter(id => ((newTiles[id].owner === -1)
-				   && (! newTiles[id].revealed))).forEach(id => {
-				       newTiles[id] = {
-					   ...newTiles[id],
-					   revealed: true,
-					   owner: userId,
-				       };
-				   });
-		newState[cid].tiles = newTiles;
+		newState[cid].tiles = [...state[cid].tiles]
+		    .map((t, i) => {
+			if (tids.indexOf(i) === -1) return t;
+			if (t.owner !== -1 || t.revealed) return t;
+			return { ...t, revealed: true, owner: userId };
+		    });
 	    });
 	
 	return newState;
@@ -229,14 +214,12 @@ const onBoundary = (state, chunkId) => {
     return Object.keys(neighbors).some(dir => state[neighbors[dir]] === undefined);
 }
 
-const hasMineNeighbors = (state, chunkId, tileId) => {
-    return Object.entries(tileNeighbors(state, chunkId, tileId)).some(([cid, tids]) => {
-	return tids.some(tid => state[cid].tiles[tid].isMine);
-    });
+const dereferencePaths = (state, paths) => {
+    return Object.entries(paths)
+	.reduce((acc, [cid, tids]) => acc.concat(tids.map(tid => state[cid].tiles[tid])), []);
 }
 
-
-const findNonMineNeighbors = (state, start) => {
+const expandArea = (state, start) => {
     const stk = start;
     const results = {};
 
@@ -245,15 +228,14 @@ const findNonMineNeighbors = (state, start) => {
 	const nextTid = stk[nextCid].pop();
 
 	if (stk[nextCid].length === 0) delete stk[nextCid];
-	if (results[nextCid] !== undefined && results[nextCid].indexOf(nextTid) !== -1) {
-	    continue;
-	}
+	if (results[nextCid] !== undefined
+	    && results[nextCid].indexOf(nextTid) !== -1) continue;
 
 	if (results[nextCid] !== undefined) results[nextCid].push(nextTid);
 	else results[nextCid] = [nextTid];
 
-	if (! hasMineNeighbors(state, nextCid, nextTid)) {
-	    const adjacents = tileNeighbors(state, nextCid, nextTid);
+	const adjacents = tileNeighbors(state, nextCid, nextTid);
+	if (! dereferencePaths(state, adjacents).some(t => t.isMine)) {
 	    Object.entries(adjacents).forEach(([cid, tids]) => {
 		if (stk[cid] === undefined) stk[cid] = tids;
 		else stk[cid] = stk[cid].concat(tids);
