@@ -2,7 +2,7 @@
     "name": "minefield",
     "version": "0.1.0",
     "private": true,
-    "main": "src/index.jsx",
+    "main": "js/index.jsx",
     "dependencies": {
 	"node-sass-chokidar": "^1.3.5",
 	"npm-run-all": "^4.1.5",

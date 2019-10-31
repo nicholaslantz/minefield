@@ -219,6 +219,8 @@ const dereferencePaths = (state, paths) => {
 	.reduce((acc, [cid, tids]) => acc.concat(tids.map(tid => state[cid].tiles[tid])), []);
 }
 
+export { dereferencePaths };
+
 const expandArea = (state, start) => {
     const stk = start;
     const results = {};

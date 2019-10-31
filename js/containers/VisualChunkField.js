@@ -2,14 +2,13 @@ import { connect } from 'react-redux';
 import { revealTile, decorateTile, scrollWindow } from '../actions';
 import ChunkField from '../components/ChunkField';
 
-import { sideLength, tileNeighbors, onBoundary } from '../reducers/chunks';
+import { sideLength, tileNeighbors, onBoundary, dereferencePaths } from '../reducers/chunks';
 
 // FIXME: I'd prefer this not run every time a chunk is modified,
 // cache result somehow.
 const processTiles = (state, chunkId) => state[chunkId].tiles.map((t, i) => ({
-    numNeighbors: Object.entries(tileNeighbors(state, chunkId, i)).reduce((acc, [cid, tids]) => {
-	return acc + tids.reduce((acc, tid) => acc + (state[cid].tiles[tid].isMine ? 1 : 0), 0);
-    }, 0),
+    numNeighbors: dereferencePaths(state, tileNeighbors(state, chunkId, i))
+	.reduce((acc, t) => acc + (t.isMine ? 1 : 0), 0),
     ...t,
 }));
 
