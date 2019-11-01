@@ -1,7 +1,7 @@
 (ql:quickload '(:hunchentoot :cl-who :cl-json :easy-routes))
 
 (defpackage :core
-  (:use :cl :cl-who :hunchentoot :cl-json :easy-routes :jsown))
+  (:use :cl :cl-who :hunchentoot :cl-json :easy-routes))
 
 (in-package :core)
 
@@ -51,6 +51,10 @@
 (defun west (n)
   (+ n 1))
 
+(defun northwest (n) (north (west n)))
+(defun northeast (n) (north (east n)))
+(defun southwest (n) (south (west n)))
+(defun southeast (n) (south (east n)))
 (defun flatten (x &optional stack out)
   (cond ((consp x) (flatten (cdr x) (cons (car x) stack) out))
 	(x         (flatten (car stack) (cdr stack) (cons x out)))
@@ -100,10 +104,68 @@ and sidelength 2 * RADIUS + 1"
 (defun reveal (cid tid uid)
   "Reveal chunk CID, tile TID, giving ownership to user UID.")
 
-(defun tile-neighbors (cid tid)
+(defconstant +tile-positions+
+  (mapcar #'cons
+	  (iota 0 +chunk-size+ 1)
+	  (mapcar (lambda (i)
+		    (or (tile-cornerp i) (tile-boundaryp i) (tile-innerp i)))
+		  (iota 0 +chunk-size+ 1)))
+  "alist of tile ids to their relative position in the chunk.")
+
+(defconstant +tile-neighbors-handlers+
+  (let* ((s (floor (sqrt +chunk-size+)))
+	 (nw 0)             (ne (- s 1))
+	 (sw (- (* s s) s)) (se (- (* s s) 1)))
+    (list
+     (cons 'northwest (lambda (cid _)
+			(list (cons cid             (list 1 s (+ s 1)))
+			      (cons (north cid)     (list sw (+ sw 1)))
+			      (cons (northwest cid) (list se))
+			      (cons (west cid)      (list ne (+ ne s))))))
+     (cons 'northeast (lambda (cid _)
+			(list (cons cid             (list (- ne 1) (+ ne s -1) (+ ne s)))
+			      (cons (north cid)     (list se (- se 1)))
+			      (cons (northeast cid) (list sw))
+			      (cons (east cid)      (list nw (+ nw s))))))
+     (cons 'southeast (lambda (cid _)
+			(list (cons cid             (list (- sw s) (- sw s -1) (+ sw 1)))
+			      (cons (south cid)     (list nw (+ nw 1)))
+			      (cons (southwest cid) (list ne))
+			      (cons (west cid)      (list se (- se s))))))
+     (cons 'southwest (lambda (cid _)
+			(list (cons cid             (list (- sw s 1) (- sw s) (+ sw 1)))
+			      (cons (south cid)     (list nw (+ nw 1)))
+			      (cons (southeast cid) (list ne))
+			      (cons (east cid)      (list se (- se s))))))
+     (cons 'north     (lambda (cid tid s)
+			(list (cons cid         (list (- tid 1) (+ tid 1) (+ tid s -1)
+						      (+ tid s) (+ tid s 1)))
+			      (cons (north cid) (let ((b (+ (* s s) (- s) tid)))
+						  (list (- b 1) b (+ b 1)))))))
+     (cons 'east      (lambda (cid tid s)
+			(list (cons cid         (list (- tid s 1) (- tid s) (+ tid s -1)
+						      (+ tid s -1) (+ tid s)))
+			      (cons (east cid)  (let ((b (+ tid (- s) tid)))
+						  (list (- b s) b (+ b s)))))))
+     (cons 'south     (lambda (cid tid s)
+			(list (cons cid         (list (- tid 1) (+ tid 1) (- tid s 1)
+						      (- tid s) (- tid s -1)))
+			      (cons (north cid) (let ((b (mod tid s)))
+						  (list (- b 1) b (+ b 1)))))))
+     (cons 'west      (lambda (cid tid s)
+			(list (cons cid         (list (- tid s) (+ tid (- s) 1) (+ tid 1) (+ tid s) (+ tid s 1)))
+			      (cons (west cid)  (let ((b (+ tid s -1)))
+						  (list (- b s) b (+ b s)))))))
+     (cons 'inner     (lambda (cid tid s)
+			(list (cons cid (list (- tid s 1)  (- tid s) (+ tid (- s) 1)
+					      (- tid 1)    (+ tid 1)
+					      (+ tid s -1) (+ tid s) (+ tid s 1))))))))
+  "TODO")
+
+(defun tile-neighbors (cid tid &optional (s (floor (sqrt +chunk-size+))))
   "Return the 8 adjacent tiles to (CID TID)."
-  (let ((s (sqrt +chunk-size+)))
-    ))
+  
+)
 
 (defun tile-cornerp (tid &optional (s (floor (sqrt +chunk-size+))))
   "Returns DIRECTION when TID is on a corner, otherwise NIL."
@@ -112,9 +174,7 @@ and sidelength 2 * RADIUS + 1"
     (cdr (assoc tid corners))))
 
 (defun tile-boundaryp (tid &optional (s (floor (sqrt +chunk-size+))))
-  "Returns DIRECTION when TID is on a chunk boundary, otherwise NIL.
-
-Note: TILE-SIDEP considers corners to be sides."
+  "Returns DIRECTION when TID is on a chunk boundary, otherwise NIL."
   (cond ((< tid s) 'north)
 	((zerop (mod tid s)) 'west)
 	((zerop (mod (1+ tid) s)) 'east)
