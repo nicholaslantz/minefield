@@ -1,20 +1,16 @@
-(ql:quickload '(:hunchentoot :cl-who :cl-json :easy-routes))
+(ql:quickload '(:alexandria :serapeum :hunchentoot :cl-who :cl-json :easy-routes))
 
 (defpackage :core
-  (:use :cl :cl-who :hunchentoot :cl-json :easy-routes))
+  (:use :alexandria :serapeum :cl)
+  (:import-from :serapeum :fmt))
 
 (in-package :core)
 
 (defconstant +chunk-size+ 16)
 (defconstant +world-side-length+ (expt 2 30))
-(defconstant +mine-probability+ (/ 2 10))
+(defconstant +mine-probability+ 20)
 (defconstant +user-actions+ '(new-connection request reveal decorate))
 (defconstant +directions+ '(north northwest west southwest south southeast east northeast))
-
-(defun uniform ()
-  "Get a random number in [0, 1)"
-  (let ((m (expt 2 31)))
-    (/ (random m) m)))
 
 (defclass chunk ()
   ((id :reader chunk-id
@@ -23,51 +19,41 @@
 	  :initform
 	  (make-array +chunk-size+
 		      :initial-contents (loop repeat +chunk-size+
-					   collect (< (uniform) +mine-probability+))))
+					   collect (< (random 100) +mine-probability+))))
    (actions :accessor chunk-actions
 	    :initform '())))
 
-(defvar *chunks* '())
-(defvar *users* '())
+(defparameter *chunks* '())
+(defparameter *users* '())
 
 (defun get-chunk (n)
-  "Returns chunk with id N.  If that chunk doesn't exist it is generated."
-  (let ((res (find-if (lambda (c) (eq n (chunk-id c))) *chunks*)))
-    (if res
-	res
-	(progn
-	  (push (make-instance 'chunk :id n) *chunks*)
-	  (car *chunks*)))))
+  "Returns chunk with id N.  If that chunk isn't a member of
+*CHUNKS* it is generated."
+  (if-let ((res (find-if (lambda (c) (eq n (chunk-id c))) *chunks*)))
+    res
+    (progn
+      (push (make-instance 'chunk :id n) *chunks*)
+      (car *chunks*))))
 
 (defun north (n &optional (s +world-side-length+))
   (- n s))
 
 (defun east (n)
-  (- n 1))
+  (+ n 1))
 
 (defun south (n &optional (s +world-side-length+))
   (+ n s))
 
 (defun west (n)
-  (+ n 1))
+  (- n 1))
 
 (defun northwest (n) (north (west n)))
 (defun northeast (n) (north (east n)))
 (defun southwest (n) (south (west n)))
 (defun southeast (n) (south (east n)))
-(defun flatten (x &optional stack out)
-  (cond ((consp x) (flatten (cdr x) (cons (car x) stack) out))
-	(x         (flatten (car stack) (cdr stack) (cons x out)))
-	(stack     (flatten (car stack) (cdr stack) out))
-	(t out)))
-
-(defun iota (start stop step)
-  (if (>= start stop)
-      nil
-      (cons start (iota (+ start step) stop step))))
 
 (defun +- (x a)
-  (cons (- x a) (+ x a)))
+  (values (- x a) (+ x a)))
 
 (defparameter *acceptor* (make-instance 'easy-routes-acceptor :port 3000))
 
@@ -89,16 +75,15 @@
 		    (cons 'tiles (chunk-mines chunks))))
 	    cids cids-neighbors chunks)))
 
-(defun new-connection-chunks (radius center)
+(defun new-connection-chunks (center radius)
   "Return a list of cids such that its a square with center CENTER
 and sidelength 2 * RADIUS + 1"
   (let* ((s +world-side-length+)
 	 (middle-upper (- center (* radius s))))
-    (let ((upper-row (iota (- middle-upper radius)
-			   (+ middle-upper radius 1)
-			   1)))
+    (let ((upper-row (range (- middle-upper radius)
+			   (+ middle-upper radius 1))))
       (apply #'append (mapcar (lambda (i)
-				(iota i (+ i (* s (length upper-row))) s))
+				(range i (+ i (* s (length upper-row))) s))
 			      upper-row)))))
 
 (defun reveal (cid tid uid)
@@ -117,22 +102,22 @@ and sidelength 2 * RADIUS + 1"
 	 (nw 0)             (ne (- s 1))
 	 (sw (- (* s s) s)) (se (- (* s s) 1)))
     (list
-     (cons 'northwest (lambda (cid _)
+     (cons 'northwest (lambda (cid)
 			(list (cons cid             (list 1 s (+ s 1)))
 			      (cons (north cid)     (list sw (+ sw 1)))
 			      (cons (northwest cid) (list se))
 			      (cons (west cid)      (list ne (+ ne s))))))
-     (cons 'northeast (lambda (cid _)
+     (cons 'northeast (lambda (cid)
 			(list (cons cid             (list (- ne 1) (+ ne s -1) (+ ne s)))
 			      (cons (north cid)     (list se (- se 1)))
 			      (cons (northeast cid) (list sw))
 			      (cons (east cid)      (list nw (+ nw s))))))
-     (cons 'southeast (lambda (cid _)
+     (cons 'southeast (lambda (cid)
 			(list (cons cid             (list (- sw s) (- sw s -1) (+ sw 1)))
 			      (cons (south cid)     (list nw (+ nw 1)))
 			      (cons (southwest cid) (list ne))
 			      (cons (west cid)      (list se (- se s))))))
-     (cons 'southwest (lambda (cid _)
+     (cons 'southwest (lambda (cid)
 			(list (cons cid             (list (- sw s 1) (- sw s) (+ sw 1)))
 			      (cons (south cid)     (list nw (+ nw 1)))
 			      (cons (southeast cid) (list ne))
@@ -153,7 +138,8 @@ and sidelength 2 * RADIUS + 1"
 			      (cons (north cid) (let ((b (mod tid s)))
 						  (list (- b 1) b (+ b 1)))))))
      (cons 'west      (lambda (cid tid s)
-			(list (cons cid         (list (- tid s) (+ tid (- s) 1) (+ tid 1) (+ tid s) (+ tid s 1)))
+			(list (cons cid         (list (- tid s) (+ tid (- s) 1) (+ tid 1)
+						      (+ tid s) (+ tid s 1)))
 			      (cons (west cid)  (let ((b (+ tid s -1)))
 						  (list (- b s) b (+ b s)))))))
      (cons 'inner     (lambda (cid tid s)
